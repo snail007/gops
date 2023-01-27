@@ -10,7 +10,6 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 )
@@ -24,10 +23,6 @@ func ConfigDir() (string, error) {
 
 	if userConfigDir, err := os.UserConfigDir(); err == nil {
 		return filepath.Join(userConfigDir, "gops"), nil
-	}
-
-	if runtime.GOOS == "windows" {
-		return filepath.Join(os.Getenv("APPDATA"), "gops"), nil
 	}
 
 	if xdgConfigDir := os.Getenv("XDG_CONFIG_HOME"); xdgConfigDir != "" {
