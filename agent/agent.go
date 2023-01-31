@@ -47,6 +47,10 @@ type Options struct {
 	// Optional.
 	Addr string
 
+	// Listener is the listener the agent will be used.
+	// Optional.
+	Listener net.Listener
+
 	// ConfigDir is the directory to store the configuration file,
 	// PID of the gops process, filename, port as well as content.
 	// Optional.
@@ -105,13 +109,17 @@ func Listen(opts Options) error {
 	if addr == "" {
 		addr = defaultAddr
 	}
-	var lc net.ListenConfig
-	if opts.ReuseSocketAddrAndPort {
-		lc.Control = setReuseAddrAndPortSockopts
-	}
-	listener, err = lc.Listen(context.Background(), "tcp", addr)
-	if err != nil {
-		return err
+	if opts.Listener != nil {
+		listener = opts.Listener
+	} else {
+		var lc net.ListenConfig
+		if opts.ReuseSocketAddrAndPort {
+			lc.Control = setReuseAddrAndPortSockopts
+		}
+		listener, err = lc.Listen(context.Background(), "tcp", addr)
+		if err != nil {
+			return err
+		}
 	}
 	port := listener.Addr().(*net.TCPAddr).Port
 	portfile = filepath.Join(gopsdir, strconv.Itoa(os.Getpid()))
